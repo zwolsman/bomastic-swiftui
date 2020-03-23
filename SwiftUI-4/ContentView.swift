@@ -122,7 +122,7 @@ class GameViewModel : ObservableObject {
     }
     
     func cashout() {
-        print("TODO")
+        events.insert("Cashed out \(stake) points. You've earned \(stake - game.initialStake) points", at: 0)
     }
     
     private func revealTile(index: Int) {
@@ -130,10 +130,10 @@ class GameViewModel : ObservableObject {
         tiles[index].state = newState //TODO tidy up
         
         if case let TileStatus.revealed(points) = newState {
-            events.insert("Found \(points) at tile \(index + 1)", at: 0)
+            events.insert("You've found \(points) points in tile \(index + 1)", at: 0)
         }
         if case TileStatus.bomb = newState {
-            events.insert("Hit a bomb at tile \(index + 1)", at: 0)
+            events.insert("You hit a bomb in tile \(index + 1) and lost \(stake) points!", at: 0)
         }
         
         if let next = game.next {
@@ -177,7 +177,7 @@ struct ContentView: View {
                     .padding([.top, .leading, .trailing], 16.0)
                     .layoutPriority(1)
                 Spacer()
-                GameStateView(stake: model.stake, next: model.next)
+                GameStateView(stake: model.stake, next: model.next, cashoutAction: model.cashout)
                 Divider()
                 List(model.events, id: \.self) { event in
                     Text(event)
@@ -254,14 +254,13 @@ struct GameButton: View {
     }
     
     func buttonText() -> some View {
-        print("Rendering state \(dataSource.state)")
         switch(dataSource.state) {
         case .bomb:
             return Text("BOMB")
         case .empty:
             return Text("[x]")
         case .revealed(let points):
-            return Text("\(points)")
+            return Text("+\(points)")
         }
     }
 }
@@ -269,6 +268,7 @@ struct GameButton: View {
 struct GameStateView: View {
     var stake: Int
     var next: Int
+    var cashoutAction: () -> ()
     
     var body: some View {
         VStack {
@@ -293,7 +293,7 @@ struct GameStateView: View {
                 }
                 
                 Spacer()
-                Button(action: {}) {
+                Button(action: cashoutAction) {
                     Text("Cashout")
                         .font(.largeTitle)
                 }
