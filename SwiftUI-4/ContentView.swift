@@ -10,113 +10,17 @@ import SwiftUI
 import Combine
 
 
-enum SquareStatus : Equatable {
+enum TileStatus : Equatable {
     case empty
     case revealed(Int)
     case bomb
 }
 
-class Square : ObservableObject {
-    @Published var status : SquareStatus
-    
-    init(status: SquareStatus) {
-        self.status = status
-    }
-    
-    var isEmpty: Bool {
-        get {
-            switch(status) {
-            case .empty:
-                return true
-            default:
-                return false
-            }
-        }
-    }
-}
-
-class GameBoard: ObservableObject {
-    @State var events = ["A 3-bomb game has started with a stake of 100 points"]
-    @Published var stake = 100
-    @Published var next: Int
-    var squares = [Square]()
-    var bombs = [Int]()
-    
-    init() {
-        for _ in 0..<25 {
-            squares.append(Square(status: .empty))
-        }
-        next = 100
-        generateBombs()
-    }
-    
-    private var emptySquares: Int {
-        get {
-            squares
-                .filter { (Square) -> Bool in
-                    switch(Square.status) {
-                    case .empty:
-                        return true
-                    default:
-                        return false
-                    }
-            }.count
-        }
-    }
-    
-    func reward() -> Int {
-        let moves = 25 - emptySquares
-        let tiles = 25
-        let bombs = 3
-        var odds = Double(tiles - moves) / Double(tiles - moves - bombs)
-        odds *= (1 - 0.005)
-        return Int(floor(Double(stake) * odds))
-    }
-    
-    func generateBombs() {
-        bombs.removeAll()
-        repeat {
-            let rng = Int.random(in: 0..<25)
-            if(!bombs.contains(rng)) {
-                bombs.append(rng)
-            }
-        }while(bombs.count < 3)
-    }
-    
-    func resetGame() {
-        
-    }
-    
-    func reveal(index: Int) {
-        print("Revealing \(index)")
-        
-        if(bombs.contains(index)) {
-            squares[index].status = .bomb
-        } else {
-            let points = reward()
-            squares[index].status = .revealed(points)
-            
-            stake += points
-            next = reward()
-        }
-        print("\(squares[index].status)")
-    }
-    
-    var gameOver: Bool {
-        get {
-            false
-        }
-    }
-    
-    
-}
-
-
 class GameLogic {
     
-    private (set) var tiles = [SquareStatus]()
-    private let initialStake: Int
-    private var bombAmount: Int
+    private (set) var tiles = [TileStatus]()
+    let initialStake: Int
+    var bombAmount: Int
     private var bombs = [Int]()
     
     private(set) var stake: Int
@@ -149,14 +53,17 @@ class GameLogic {
         }while(bombs.count < bombAmount)
     }
     
-    func reveal(index: Int) {
+    func reveal(index: Int) -> TileStatus {
         if(bombs.contains(index)) {
             tiles[index] = .bomb
         } else {
-            let state = SquareStatus.revealed(try! calculateReward())
+            let state = TileStatus.revealed(try! calculateReward())
             tiles[index] = state
+            stake = calculateStake()
             next = calculateNext()
         }
+        
+        return tiles[index] //TODO: clean this up
     }
     
     private func calculateReward() throws -> Int {
@@ -170,11 +77,11 @@ class GameLogic {
     }
     
     private func calculateStake() -> Int {
-        tiles.reduce(initialStake) { (acc, tile) -> Int in
-            if case let SquareStatus.revealed(points) = tile {
+        return tiles.reduce(initialStake) { (acc, tile) -> Int in
+            if case let TileStatus.revealed(points) = tile {
                 return acc + points
             } else {
-                return 0
+                return acc
             }
         }
     }
@@ -192,6 +99,7 @@ class GameViewModel : ObservableObject {
     @Published private (set) var tiles = [TileViewModel]()
     @Published private (set) var stake: Int
     @Published private (set) var next: Int
+    @Published private (set) var events = [String]()
     
     private let game: GameLogic
     
@@ -200,6 +108,7 @@ class GameViewModel : ObservableObject {
         self.stake = game.stake
         self.next = game.next!
         
+        events.append("Started game with \(game.bombAmount) bombs and an initial stake of \(game.initialStake)")
         bindTiles()
     }
     
@@ -217,7 +126,15 @@ class GameViewModel : ObservableObject {
     }
     
     private func revealTile(index: Int) {
-        game.reveal(index: index)
+        let newState = game.reveal(index: index)
+        tiles[index].state = newState //TODO tidy up
+        
+        if case let TileStatus.revealed(points) = newState {
+            events.insert("Found \(points) at tile \(index + 1)", at: 0)
+        }
+        if case TileStatus.bomb = newState {
+            events.insert("Hit a bomb at tile \(index + 1)", at: 0)
+        }
         
         if let next = game.next {
             self.stake = game.stake
@@ -227,12 +144,18 @@ class GameViewModel : ObservableObject {
     
 }
 
-class TileViewModel : ObservableObject {
+class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertible {
+    var debugDescription: String {
+        "TileViewModel(state=\(state))"
+    }
     
-    @Published private(set) var state: SquareStatus
+    
+    let id = UUID()
+    
+    @Published var state: TileStatus
     let action: () -> ()
     
-    init(tileState: SquareStatus, action: @escaping () -> ()) {
+    init(tileState: TileStatus, action: @escaping () -> ()) {
         self.state = tileState
         self.action = action
     }
@@ -245,18 +168,18 @@ class TileViewModel : ObservableObject {
 }
 
 struct ContentView: View {
-    @ObservedObject private var game = GameBoard()
+    @ObservedObject private var model = GameViewModel(game: GameLogic(initialStake: 100, bombs: 3))
     
     var body: some View {
         NavigationView {
             VStack {
-                GameField(game: game)
+                GameField(tiles: model.tiles)
                     .padding([.top, .leading, .trailing], 16.0)
                     .layoutPriority(1)
                 Spacer()
-                GameStateView(stake: game.stake, next: game.next)
+                GameStateView(stake: model.stake, next: model.next)
                 Divider()
-                List(game.events, id: \.self) { event in
+                List(model.events, id: \.self) { event in
                     Text(event)
                 }
             }.navigationBarTitle("Bombastic", displayMode: .inline)
@@ -271,36 +194,31 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 struct GameField: View {
-    let game: GameBoard
+    let tiles: [TileViewModel]
     
     var body: some View {
         VStack(spacing: 8.0) {
             ForEach(0..<5, id: \.self) { index in
-                GameRow(row: index, game: self.game)
+                GameRow(tiles: self.tiles[index * 5..<index * 5 + 5])
             }
         }.aspectRatio(1.0, contentMode: .fit)
     }
 }
 
 struct GameRow: View {
-    let row: Int
-    let game: GameBoard
+    let tiles: ArraySlice<TileViewModel>
     
     var body: some View {
         HStack(spacing: 8.0) {
-            ForEach(0..<5) { col -> GameButton in
-                let index = self.row * 5 + col
-                let square = self.game.squares[index]
-                
-                return GameButton(dataSource: square, action: { self.game.reveal(index: index) })
+            ForEach(tiles) { tile in
+                GameButton(dataSource: tile)
             }
         }
     }
 }
 
 struct GameButton: View {
-    @ObservedObject var dataSource: Square
-    var action: () -> ()
+    @ObservedObject var dataSource: TileViewModel
     
     var body: some View {
         HStack {
@@ -311,7 +229,7 @@ struct GameButton: View {
     
     func gameButton() -> some View {
         let button = createButton()
-        switch(dataSource.status) {
+        switch(dataSource.state) {
         case .empty:
             return button
                 .background(Color(hue: 0.0, saturation: 0.0, brightness: 0.928))
@@ -327,7 +245,7 @@ struct GameButton: View {
         }
     }
     func createButton() -> some View {
-        Button(action: action) {
+        Button(action: dataSource.action) {
             buttonText()
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
@@ -336,8 +254,8 @@ struct GameButton: View {
     }
     
     func buttonText() -> some View {
-        print("Rendering state \(dataSource.status)")
-        switch(dataSource.status) {
+        print("Rendering state \(dataSource.state)")
+        switch(dataSource.state) {
         case .bomb:
             return Text("BOMB")
         case .empty:
