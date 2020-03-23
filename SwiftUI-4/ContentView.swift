@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 
 
-enum SquareStatus {
+enum SquareStatus : Equatable {
     case empty
     case revealed(Int)
     case bomb
@@ -91,7 +91,7 @@ class GameBoard: ObservableObject {
         print("Revealing \(index)")
         
         if(bombs.contains(index)) {
-              squares[index].status = .bomb
+            squares[index].status = .bomb
         } else {
             let points = reward()
             squares[index].status = .revealed(points)
@@ -109,6 +109,139 @@ class GameBoard: ObservableObject {
     }
     
     
+}
+
+
+class GameLogic {
+    
+    private (set) var tiles = [SquareStatus]()
+    private let initialStake: Int
+    private var bombAmount: Int
+    private var bombs = [Int]()
+    
+    private(set) var stake: Int
+    private (set) var next: Int?
+    
+    init(initialStake: Int, bombs: Int) {
+        self.initialStake = initialStake
+        self.stake = initialStake //calculateStake()
+        self.next = initialStake //calculateNext()
+        self.bombAmount = bombs
+        
+        generateTiles()
+        generateBombs()
+    }
+    
+    private func generateTiles()  {
+        tiles.removeAll()
+        for _ in 0..<25 {
+            tiles.append(.empty)
+        }
+    }
+    
+    private func generateBombs() {
+        bombs.removeAll()
+        repeat {
+            let rng = Int.random(in: 0..<25)
+            if(!bombs.contains(rng)) {
+                bombs.append(rng)
+            }
+        }while(bombs.count < bombAmount)
+    }
+    
+    func reveal(index: Int) {
+        if(bombs.contains(index)) {
+            tiles[index] = .bomb
+        } else {
+            let state = SquareStatus.revealed(try! calculateReward())
+            tiles[index] = state
+            next = calculateNext()
+        }
+    }
+    
+    private func calculateReward() throws -> Int {
+        let emptyTiles = tiles.filter { $0 == .empty }.count
+        let moves = 25 - emptyTiles
+        let tiles = 25
+        let bombs = 3
+        var odds = Double(tiles - moves) / Double(tiles - moves - bombs)
+        odds *= (1 - 0.005)
+        return Int(floor(Double(stake) * odds)) - stake
+    }
+    
+    private func calculateStake() -> Int {
+        tiles.reduce(initialStake) { (acc, tile) -> Int in
+            if case let SquareStatus.revealed(points) = tile {
+                return acc + points
+            } else {
+                return 0
+            }
+        }
+    }
+    
+    private func calculateNext() -> Int? {
+        do {
+            return try calculateReward()
+        } catch (_) {
+            return nil
+        }
+    }
+}
+
+class GameViewModel : ObservableObject {
+    @Published private (set) var tiles = [TileViewModel]()
+    @Published private (set) var stake: Int
+    @Published private (set) var next: Int
+    
+    private let game: GameLogic
+    
+    init(game: GameLogic) {
+        self.game = game
+        self.stake = game.stake
+        self.next = game.next!
+        
+        bindTiles()
+    }
+    
+    private func bindTiles() {
+        for i in game.tiles.indices {
+            let model = TileViewModel(tileState: game.tiles[i]) {
+                self.revealTile(index: i)
+            }
+            tiles.append(model)
+        }
+    }
+    
+    func cashout() {
+        print("TODO")
+    }
+    
+    private func revealTile(index: Int) {
+        game.reveal(index: index)
+        
+        if let next = game.next {
+            self.stake = game.stake
+            self.next = next
+        }
+    }
+    
+}
+
+class TileViewModel : ObservableObject {
+    
+    @Published private(set) var state: SquareStatus
+    let action: () -> ()
+    
+    init(tileState: SquareStatus, action: @escaping () -> ()) {
+        self.state = tileState
+        self.action = action
+    }
+    
+    var isEmpty: Bool {
+        get {
+            state == .empty
+        }
+    }
 }
 
 struct ContentView: View {

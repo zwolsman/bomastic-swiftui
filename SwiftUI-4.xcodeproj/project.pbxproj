@@ -13,6 +13,7 @@
 		EA9A3E4724267E1300201C0C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA9A3E4624267E1300201C0C /* Assets.xcassets */; };
 		EA9A3E4A24267E1300201C0C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA9A3E4924267E1300201C0C /* Preview Assets.xcassets */; };
 		EA9A3E4D24267E1300201C0C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EA9A3E4B24267E1300201C0C /* LaunchScreen.storyboard */; };
+		EA9DFFAD2427D3AF00555352 /* CreateGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9DFFAC2427D3AF00555352 /* CreateGameView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		EA9A3E4924267E1300201C0C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		EA9A3E4C24267E1300201C0C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EA9A3E4E24267E1300201C0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EA9DFFAC2427D3AF00555352 /* CreateGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGameView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				EA9A3E4B24267E1300201C0C /* LaunchScreen.storyboard */,
 				EA9A3E4E24267E1300201C0C /* Info.plist */,
 				EA9A3E4824267E1300201C0C /* Preview Content */,
+				EA9DFFAC2427D3AF00555352 /* CreateGameView.swift */,
 			);
 			path = "SwiftUI-4";
 			sourceTree = "<group>";
@@ -146,6 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA9DFFAD2427D3AF00555352 /* CreateGameView.swift in Sources */,
 				EA9A3E4124267E1100201C0C /* AppDelegate.swift in Sources */,
 				EA9A3E4324267E1100201C0C /* SceneDelegate.swift in Sources */,
 				EA9A3E4524267E1100201C0C /* ContentView.swift in Sources */,
