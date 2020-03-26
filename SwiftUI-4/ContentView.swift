@@ -19,7 +19,7 @@ struct ContentView: View {
                     .padding([.top, .leading, .trailing], 16.0)
                     .layoutPriority(1)
                 Spacer()
-                GameStateView(stake: model.stake, next: model.next, cashoutAction: model.cashout)
+                GameStateView(stake: model.stake, next: model.next, cashoutAction: model.cashout, canCashOut: model.isActive)
                 Divider()
                 List(model.events, id: \.self) { event in
                     Text(event)

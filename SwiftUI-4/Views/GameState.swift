@@ -12,6 +12,7 @@ struct GameStateView: View {
     var stake: Int
     var next: Int
     var cashoutAction: () -> ()
+    var canCashOut: Bool
     
     var body: some View {
         VStack {
@@ -41,8 +42,9 @@ struct GameStateView: View {
                         .font(.largeTitle)
                 }
                 .padding(.horizontal, 8.0)
-                .background(Color.yellow)
+                .background(canCashOut ? Color.yellow : Color.gray)
                 .foregroundColor(.white)
+                .disabled(!canCashOut)
                 
             }
             .padding(.horizontal, 16.0)
@@ -53,6 +55,9 @@ struct GameStateView: View {
 }
 struct GameStateView_Previews: PreviewProvider {
     static var previews: some View {
-        GameStateView(stake: 123, next: 12, cashoutAction: {})
+        VStack(alignment: .center, spacing: 16.0) {
+            GameStateView(stake: 123, next: 12, cashoutAction: {}, canCashOut: true)
+            GameStateView(stake: 123, next: 12, cashoutAction: {}, canCashOut: false)
+        }
     }
 }

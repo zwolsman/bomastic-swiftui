@@ -26,7 +26,7 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
         self.action = action
     }
     
-    var isEmpty: Bool {
+    var allowsHitTesting: Bool {
         get {
             state == .empty
         }
@@ -36,11 +36,22 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
         get {
             switch(state) {
             case .bomb:
-                return Color.red
-            case .empty:
-                return Color.gray
-            case .revealed(_):
-                return Color.green
+                return .red
+            case .empty, .revealed(_):
+                return .gray
+            case .discovered(_):
+                return .green
+            }
+        }
+    }
+    
+    var foreColor: Color {
+        get {
+            switch(state) {
+            case .revealed(true):
+                return .red
+            default:
+                return .white
             }
         }
     }
@@ -48,11 +59,11 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
     var text: String {
         get {
             switch(state) {
-            case .bomb:
+            case .bomb, .revealed(true):
                 return "BOMB"
-            case .empty:
+            case .empty, .revealed(false):
                 return " "
-            case .revealed(let points):
+            case .discovered(let points):
                 return "+\(points)"
             }
         }

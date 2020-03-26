@@ -14,6 +14,7 @@ class GameViewModel : ObservableObject {
     @Published private (set) var stake: Int
     @Published private (set) var next: Int
     @Published private (set) var events = [String]()
+    @Published private (set) var isActive = true
     
     private let game: GameLogic
     
@@ -27,6 +28,7 @@ class GameViewModel : ObservableObject {
     }
     
     private func bindTiles() {
+        tiles.removeAll(keepingCapacity: true)
         for i in game.tiles.indices {
             let model = TileViewModel(tileState: game.tiles[i]) {
                 self.revealTile(index: i)
@@ -37,17 +39,19 @@ class GameViewModel : ObservableObject {
     
     func cashout() {
         events.insert("Cashed out \(stake) points. You've earned \(stake - game.initialStake) points", at: 0)
+        finish()
     }
     
     private func revealTile(index: Int) {
         let newState = game.reveal(index: index)
         tiles[index].state = newState //TODO tidy up
         
-        if case let TileStatus.revealed(points) = newState {
+        if case let TileStatus.discovered(points) = newState {
             events.insert("You've found \(points) points in tile \(index + 1)", at: 0)
         }
         if case TileStatus.bomb = newState {
             events.insert("You hit a bomb in tile \(index + 1) and lost \(stake) points!", at: 0)
+            finish()
         }
         
         if let next = game.next {
@@ -56,4 +60,9 @@ class GameViewModel : ObservableObject {
         }
     }
     
+    private func finish() {
+        game.finish()
+        isActive = false
+        bindTiles()
+    }
 }

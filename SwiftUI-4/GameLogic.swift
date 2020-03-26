@@ -10,8 +10,9 @@ import Foundation
 
 enum TileStatus : Equatable {
     case empty
-    case revealed(Int)
+    case discovered(Int)
     case bomb
+    case revealed(Bool)
 }
 
 class GameLogic {
@@ -48,20 +49,28 @@ class GameLogic {
             if(!bombs.contains(rng)) {
                 bombs.append(rng)
             }
-        }while(bombs.count < bombAmount)
+        } while(bombs.count < bombAmount)
     }
     
     func reveal(index: Int) -> TileStatus {
         if(bombs.contains(index)) {
             tiles[index] = .bomb
         } else {
-            let state = TileStatus.revealed(try! calculateReward())
+            let state = TileStatus.discovered(try! calculateReward())
             tiles[index] = state
             stake = calculateStake()
             next = calculateNext()
         }
         
         return tiles[index] //TODO: clean this up
+    }
+    
+    func finish() {
+        for i in tiles.indices {
+            if case TileStatus.empty = tiles[i] {
+                tiles[i] = .revealed(bombs.contains(i))
+            }
+        }
     }
     
     private func calculateReward() throws -> Int {
@@ -76,7 +85,7 @@ class GameLogic {
     
     private func calculateStake() -> Int {
         return tiles.reduce(initialStake) { (acc, tile) -> Int in
-            if case let TileStatus.revealed(points) = tile {
+            if case let TileStatus.discovered(points) = tile {
                 return acc + points
             } else {
                 return acc

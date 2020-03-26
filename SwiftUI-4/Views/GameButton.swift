@@ -15,13 +15,13 @@ struct GameButton: View {
         HStack {
             Button(action: model.action) {
                 Text(model.text)
-                    .foregroundColor(.white)
+                    .foregroundColor(model.foreColor)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .clipShape(Rectangle())
             .background(model.color)
             .aspectRatio(1.0, contentMode: .fill)
-            .allowsHitTesting(model.isEmpty)
+            .allowsHitTesting(model.allowsHitTesting)
         }
     }
 
@@ -33,10 +33,13 @@ struct GameButton_Previews: PreviewProvider {
             GameButton(model: TileViewModel(tileState: .empty, action: {}))
             .frame(width: 64, height: 64)
             
-            GameButton(model: TileViewModel(tileState: .revealed(100), action: {}))
+            GameButton(model: TileViewModel(tileState: .discovered(100), action: {}))
             .frame(width: 64, height: 64)
             
             GameButton(model: TileViewModel(tileState: .bomb, action: {}))
+            .frame(width: 64, height: 64)
+            
+            GameButton(model: TileViewModel(tileState: .revealed(true), action: {}))
             .frame(width: 64, height: 64)
             
         }
