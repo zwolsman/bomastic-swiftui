@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertible {
     var debugDescription: String {
@@ -28,6 +29,32 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
     var isEmpty: Bool {
         get {
             state == .empty
+        }
+    }
+    
+    var color: Color {
+        get {
+            switch(state) {
+            case .bomb:
+                return Color.red
+            case .empty:
+                return Color.gray
+            case .revealed(_):
+                return Color.green
+            }
+        }
+    }
+    
+    var text: String {
+        get {
+            switch(state) {
+            case .bomb:
+                return "BOMB"
+            case .empty:
+                return " "
+            case .revealed(let points):
+                return "+\(points)"
+            }
         }
     }
 }

@@ -53,58 +53,29 @@ struct GameRow: View {
     var body: some View {
         HStack(spacing: 8.0) {
             ForEach(tiles) { tile in
-                GameButton(dataSource: tile)
+                GameButton(model: tile)
             }
         }
     }
 }
 
 struct GameButton: View {
-    @ObservedObject var dataSource: TileViewModel
+    @ObservedObject var model: TileViewModel
     
     var body: some View {
         HStack {
-            gameButton()
-                .allowsHitTesting(dataSource.isEmpty)
+            Button(action: model.action) {
+                Text(model.text)
+                    .foregroundColor(.white)
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .clipShape(Rectangle())
+            .background(model.color)
+            .aspectRatio(1.0, contentMode: .fill)
+            .allowsHitTesting(model.isEmpty)
         }
     }
-    
-    func gameButton() -> some View {
-        let button = createButton()
-        switch(dataSource.state) {
-        case .empty:
-            return button
-                .background(Color(hue: 0.0, saturation: 0.0, brightness: 0.928))
-                .foregroundColor(.white)
-        case .revealed(_):
-            return button
-                .background(Color.green)
-                .foregroundColor(.white)
-        case .bomb:
-            return button
-                .background(Color.red)
-                .foregroundColor(.white)
-        }
-    }
-    func createButton() -> some View {
-        Button(action: dataSource.action) {
-            buttonText()
-        }
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .clipShape(Rectangle())
-        .aspectRatio(1.0, contentMode: .fill)
-    }
-    
-    func buttonText() -> some View {
-        switch(dataSource.state) {
-        case .bomb:
-            return Text("BOMB")
-        case .empty:
-            return Text("[x]")
-        case .revealed(let points):
-            return Text("+\(points)")
-        }
-    }
+
 }
 
 struct GameStateView: View {
@@ -139,6 +110,10 @@ struct GameStateView: View {
                     Text("Cashout")
                         .font(.largeTitle)
                 }
+                .padding(.horizontal, 8.0)
+                .background(Color.yellow)
+                .foregroundColor(.white)
+                
             }
             .padding(.horizontal, 16.0)
             
