@@ -14,7 +14,7 @@ struct GameField: View {
     var body: some View {
         VStack(spacing: 8.0) {
             ForEach(0..<5, id: \.self) { index in
-                GameRow(tiles: self.tiles[index * 5..<index * 5 + 5])
+                GameFieldRow(tiles: self.tiles[index * 5..<index * 5 + 5])
             }
         }.aspectRatio(1.0, contentMode: .fit)
     }

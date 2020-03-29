@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct GameRow: View {
+struct GameFieldRow: View {
     let tiles: ArraySlice<TileViewModel>
     
     var body: some View {
@@ -20,10 +20,10 @@ struct GameRow: View {
     }
 }
 
-struct GameRow_Previews: PreviewProvider {
+struct GameFieldRow_Previews: PreviewProvider {
     static var previews: some View {
         
-        GameRow(tiles: generateTiles())
+        GameFieldRow(tiles: generateTiles())
             .aspectRatio(5/1, contentMode: .fit)
             .padding(32)
     }
