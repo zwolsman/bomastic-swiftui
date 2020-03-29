@@ -14,12 +14,14 @@ struct GameButton: View {
     var body: some View {
         HStack {
             Button(action: model.action) {
+                ZStack {
+                    Rectangle()
+                        .foregroundColor(model.color)
                 Text(model.text)
                     .foregroundColor(model.foreColor)
+                }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .clipShape(Rectangle())
-            .background(model.color)
             .aspectRatio(1.0, contentMode: .fill)
             .allowsHitTesting(model.allowsHitTesting)
         }

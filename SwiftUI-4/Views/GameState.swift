@@ -38,11 +38,14 @@ struct GameStateView: View {
                 
                 Spacer()
                 Button(action: cashoutAction) {
+                    Group {
                     Text("Cashout")
-                        .font(.largeTitle)
+                    .font(.largeTitle)
+                        .padding(.horizontal, 8.0)
+                    }.background(canCashOut ? Color.yellow : Color.gray)
+                
                 }
-                .padding(.horizontal, 8.0)
-                .background(canCashOut ? Color.yellow : Color.gray)
+                
                 .foregroundColor(.white)
                 .disabled(!canCashOut)
                 
