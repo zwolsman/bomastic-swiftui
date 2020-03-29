@@ -26,7 +26,7 @@ struct CreateGameScene: View {
          "Magenta": flatMagentaColor(),
          "Maroon": flatMaroonColor(),
          "Mint": flatMintColor(),
-         "NavyBlue": flatNavyBlueColor(),
+         "Navy Blue": flatNavyBlueColor(),
          "Orange": flatOrangeColor(),
          "Pink": flatPinkColor(),
          "Plum": flatPlumColor(),
@@ -38,7 +38,7 @@ struct CreateGameScene: View {
          "Teal": flatTealColor(),
          "Watermelon": flatWatermelonColor(),
          "White": flatWhiteColor(),
-         "Yellow": flatYellowColor()]
+            "Yellow": flatYellowColor()]
     
     
     let closeAction: () -> Void
@@ -76,7 +76,7 @@ struct CreateGameScene: View {
             }.navigationBarTitle("Create game")
                 .navigationBarItems(leading: Button(action: closeAction) { Text("Cancel")})
             
-        }
+        }.navigationViewStyle(StackNavigationViewStyle())
     }
     
     private func createGame() {
