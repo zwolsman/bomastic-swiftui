@@ -16,23 +16,25 @@ class GamesViewModel : ObservableObject {
         games.append(game)
     }
 }
+
 struct GamesListScene: View {
     
     @ObservedObject private var model = GamesViewModel()
     @State private var createGame = false
     
     var body: some View {
+        NavigationView {
         List(model.games) { game in
             NavigationLink(destination: GameScene(model: game)) {
-                HStack {
-                    Text("\(game.id)")
-                }
+                GameRow(model: game)
+                    .frame(maxHeight: 64)
             }
         }.navigationBarTitle("Games")
             .navigationBarItems(trailing: Button(action: { self.createGame.toggle() }) { Text("New")})
             .sheet(isPresented: $createGame, content: {
                 CreateGameScene(closeAction: self.showGameCreation, successAction: self.gameCreated)
             })
+        }
     }
     
     
@@ -47,8 +49,6 @@ struct GamesListScene: View {
 
 struct GamesListScene_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            GamesListScene()
-        }
+        GamesListScene()
     }
 }

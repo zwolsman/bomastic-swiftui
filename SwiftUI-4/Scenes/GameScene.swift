@@ -25,6 +25,7 @@ struct GameScene: View {
             }
             .padding(.vertical, 0.0)
         }.navigationBarTitle("Bombastic", displayMode: .inline)
+        
     }
 }
 

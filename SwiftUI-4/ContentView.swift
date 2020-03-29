@@ -20,13 +20,12 @@ struct ContentView: View {
             }.tag(0)
             
             NavigationView {
-                
                 List {
                     Text("Invites")
                 }.navigationBarTitle("Invites")
                 
             }.tabItem {
-                Image(systemName: "app.fill")
+                Image(systemName: "tray.fill")
                 Text("Invites")
             }
         }
