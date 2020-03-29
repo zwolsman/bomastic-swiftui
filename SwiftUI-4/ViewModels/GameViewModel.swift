@@ -11,7 +11,8 @@ import Combine
 import UIKit
 import SwiftUI
 
-class GameViewModel : ObservableObject {
+class GameViewModel : ObservableObject, Identifiable {
+    let id = UUID()
     @Published private (set) var tiles = [TileViewModel]()
     @Published private (set) var stake: Int
     @Published private (set) var next: Int

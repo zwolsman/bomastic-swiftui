@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct GameScene: View {
-    @ObservedObject private var model: GameViewModel
+    @ObservedObject var model: GameViewModel
     
     var body: some View {
         VStack {
@@ -26,14 +26,10 @@ struct GameScene: View {
             .padding(.vertical, 0.0)
         }.navigationBarTitle("Bombastic", displayMode: .inline)
     }
-    
-    init(game: GameLogic, color: Color) {
-        model = GameViewModel(game: game, color: color)
-    }
 }
 
 struct GameScene_Previews: PreviewProvider {
     static var previews: some View {
-        GameScene(game: GameLogic(initialStake: 100, bombs: 3), color: Color.flatGreen)
+        GameScene(model: GameViewModel(game: GameLogic(initialStake: 100, bombs: 3), color: Color.flatGreen))
     }
 }

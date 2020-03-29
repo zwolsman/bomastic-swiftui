@@ -14,19 +14,20 @@ struct ContentView: View {
     var body: some View {
         
         TabView {
-            CreateGameScene().tabItem {
-                Image(systemName: "plus")
-                Text("Create game")
+            GamesListScene().tabItem {
+                Image(systemName: "app.fill")
+                Text("Games")
             }.tag(0)
             
             NavigationView {
                 
                 List {
-                    Text("History")
-                }.navigationBarTitle("History")
+                    Text("Invites")
+                }.navigationBarTitle("Invites")
                 
             }.tabItem {
-                Text("History")
+                Image(systemName: "app.fill")
+                Text("Invites")
             }
         }
     }

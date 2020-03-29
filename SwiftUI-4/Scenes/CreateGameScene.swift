@@ -41,6 +41,8 @@ struct CreateGameScene: View {
          "Yellow": flatYellowColor()]
     
     
+    let closeAction: () -> Void
+    let successAction: (GameViewModel) -> Void
     var body: some View {
         NavigationView {
             Form {
@@ -53,10 +55,8 @@ struct CreateGameScene: View {
                         
                         ForEach(Array(colors.keys).sorted(), id: \.self) { key in
                             HStack(alignment: .center) {
-                                Rectangle()
-                                    .frame(width: 16, height: 16)
+                                Image(systemName: "app.fill")
                                     .foregroundColor(self.colors[key]!)
-                                    .padding(8.0)
                                 Text(key)
                             }.tag(key)
                         }
@@ -69,21 +69,39 @@ struct CreateGameScene: View {
                         .padding(.vertical, 8.0)
                 }
                 Section {
-                    NavigationLink(destination:
-                    GameScene(game: GameLogic(initialStake: Int(stake)!, bombs: Int("\(bomb.first!)")! ), color: colors[self.color]!)) {
+                    Button(action: self.createGame) {
                         Text("Create game")
-                            .foregroundColor(.accentColor)
                     }
-                    
                 }
             }.navigationBarTitle("Create game")
+                .navigationBarItems(leading: Button(action: closeAction) { Text("Cancel")})
             
         }
+    }
+    
+    private func createGame() {
+        
+        guard let stake = Int(stake) else {
+            return
+        }
+        
+        guard let bombs = Int("\(bomb.first!)") else {
+            return
+        }
+        
+        guard let color = colors[self.color] else {
+            return
+        }
+        
+        let logic = GameLogic(initialStake: stake, bombs: bombs)
+        let model = GameViewModel(game: logic, color: color)
+        
+        successAction(model)
     }
 }
 
 struct CreateGameScene_Previews: PreviewProvider {
     static var previews: some View {
-        CreateGameScene()
+        CreateGameScene(closeAction: {}, successAction: {_ in })
     }
 }
