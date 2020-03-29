@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 class GameViewModel : ObservableObject {
     @Published private (set) var tiles = [TileViewModel]()
@@ -48,9 +49,13 @@ class GameViewModel : ObservableObject {
         
         if case let TileStatus.discovered(points) = newState {
             events.insert("You've found \(points) points in tile \(index + 1)", at: 0)
+            let generator = UISelectionFeedbackGenerator()
+            generator.selectionChanged()
         }
         if case TileStatus.bomb = newState {
             events.insert("You hit a bomb in tile \(index + 1) and lost \(stake) points!", at: 0)
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
+            generator.impactOccurred()
             finish()
         }
         
