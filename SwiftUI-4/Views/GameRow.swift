@@ -33,7 +33,7 @@ private func generateTiles() -> ArraySlice<TileViewModel> {
     var tiles = [TileViewModel]()
           
     for i in 0..<5 {
-        tiles.append(TileViewModel(tileState: .empty, action: {
+        tiles.append(TileViewModel(tileState: .empty, color: Color.flatGreen, action: {
             tiles[i].state = .bomb
         }))
     }

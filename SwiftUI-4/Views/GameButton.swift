@@ -32,16 +32,16 @@ struct GameButton: View {
 struct GameButton_Previews: PreviewProvider {
     static var previews: some View {
         HStack(spacing: 16) {
-            GameButton(model: TileViewModel(tileState: .empty, action: {}))
+            GameButton(model: TileViewModel(tileState: .empty, color: Color.flatGreen, action: {}))
             .frame(width: 64, height: 64)
             
-            GameButton(model: TileViewModel(tileState: .discovered(100), action: {}))
+            GameButton(model: TileViewModel(tileState: .discovered(100), color: Color.flatGreen, action: {}))
             .frame(width: 64, height: 64)
             
-            GameButton(model: TileViewModel(tileState: .bomb, action: {}))
+            GameButton(model: TileViewModel(tileState: .bomb, color: Color.flatGreen, action: {}))
             .frame(width: 64, height: 64)
             
-            GameButton(model: TileViewModel(tileState: .revealed(true), action: {}))
+            GameButton(model: TileViewModel(tileState: .revealed(true), color: Color.flatGreen, action: {}))
             .frame(width: 64, height: 64)
             
         }

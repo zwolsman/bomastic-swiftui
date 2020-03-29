@@ -10,21 +10,24 @@ import SwiftUI
 import Combine
 
 struct ContentView: View {
-    @ObservedObject private var model = GameViewModel(game: GameLogic(initialStake: 100, bombs: 3))
-    
+
     var body: some View {
-        NavigationView {
-            VStack {
-                GameField(tiles: model.tiles)
-                    .padding([.top, .leading, .trailing], 16.0)
-                    .layoutPriority(1)
-                Spacer()
-                GameStateView(stake: model.stake, next: model.next, cashoutAction: model.cashout, canCashOut: model.isActive)
-                Divider()
-                List(model.events, id: \.self) { event in
-                    Text(event)
-                }
-            }.navigationBarTitle("Bombastic", displayMode: .inline)
+        
+        TabView {
+            CreateGameScene().tabItem {
+                Image(systemName: "plus")
+                Text("Create game")
+            }.tag(0)
+            
+            NavigationView {
+                
+                List {
+                    Text("History")
+                }.navigationBarTitle("History")
+                
+            }.tabItem {
+                Text("History")
+            }
         }
     }
 }

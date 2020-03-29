@@ -28,7 +28,7 @@ class GameLogic {
     init(initialStake: Int, bombs: Int) {
         self.initialStake = initialStake
         self.stake = initialStake //calculateStake()
-        self.next = initialStake //calculateNext()
+        self.next = try! GameLogic.calculateReward(emptyTiles: 25, bombs: bombs, stake: initialStake)
         self.bombAmount = bombs
         
         generateTiles()
@@ -73,11 +73,9 @@ class GameLogic {
         }
     }
     
-    private func calculateReward() throws -> Int {
-        let emptyTiles = tiles.filter { $0 == .empty }.count
+    private static func calculateReward(emptyTiles: Int, bombs: Int, stake: Int) throws -> Int {
         let moves = 25 - emptyTiles
         let tiles = 25
-        let bombs = 3
         var odds = Double(tiles - moves) / Double(tiles - moves - bombs)
         odds *= (1 - 0.005)
         return Int(floor(Double(stake) * odds)) - stake
@@ -93,6 +91,10 @@ class GameLogic {
         }
     }
     
+    private func calculateReward() throws -> Int {
+        return try GameLogic.calculateReward(emptyTiles: tiles.filter { $0 == .empty }.count, bombs: bombAmount, stake: calculateStake())
+    }
+    
     private func calculateNext() -> Int? {
         do {
             return try calculateReward()
@@ -100,4 +102,5 @@ class GameLogic {
             return nil
         }
     }
+    
 }

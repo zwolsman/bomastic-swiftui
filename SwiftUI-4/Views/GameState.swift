@@ -9,45 +9,46 @@
 import SwiftUI
 
 struct GameStateView: View {
-    var stake: Int
-    var next: Int
-    var cashoutAction: () -> ()
-    var canCashOut: Bool
-    
+    @ObservedObject private (set) var model: GameViewModel
+//    var stake: Int
+//    var next: Int
+//    var cashoutAction: () -> ()
+//    var canCashOut: Bool
+//
     var body: some View {
         VStack {
             
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading) {
-                    Text("Next")
+                    Text("NEXT")
                         .font(.headline)
-                    Text("\(next)")
+                    Text("\(model.next)")
                         .font(.largeTitle)
-                        .foregroundColor(Color.green)
+                        .foregroundColor(model.color)
                     
                 }  .padding(.trailing, 8.0)
                 
                 
                 VStack(alignment: .leading) {
-                    Text("Stake")
+                    Text("STAKE")
                         .font(.headline)
-                    Text("\(stake)")
+                    Text("\(model.stake)")
                         .font(.largeTitle)
-                        .foregroundColor(Color.yellow)
+                        .foregroundColor(Color.flatYellow)
                 }
                 
                 Spacer()
-                Button(action: cashoutAction) {
+                Button(action: model.cashout) {
                     Group {
                     Text("Cashout")
                     .font(.largeTitle)
                         .padding(.horizontal, 8.0)
-                    }.background(canCashOut ? Color.yellow : Color.gray)
+                    }.background(model.isActive ? Color.flatYellow : Color.flatWhiteDark)
                 
                 }
                 
-                .foregroundColor(.white)
-                .disabled(!canCashOut)
+                .foregroundColor(.flatWhite)
+                .disabled(!model.isActive)
                 
             }
             .padding(.horizontal, 16.0)
@@ -59,8 +60,9 @@ struct GameStateView: View {
 struct GameStateView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(alignment: .center, spacing: 16.0) {
-            GameStateView(stake: 123, next: 12, cashoutAction: {}, canCashOut: true)
-            GameStateView(stake: 123, next: 12, cashoutAction: {}, canCashOut: false)
+            GameStateView(model: GameViewModel(game: GameLogic(initialStake: 123, bombs: 3), color: Color.flatGreen))
+            GameStateView(model: GameViewModel(game: GameLogic(initialStake: 123, bombs: 3), color: Color.flatMaroon))
+            GameStateView(model: GameViewModel(game: GameLogic(initialStake: 123, bombs: 3), color: Color.flatWatermelon))
         }
     }
 }

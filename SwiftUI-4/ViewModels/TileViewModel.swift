@@ -15,15 +15,17 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
         "TileViewModel(state=\(state))"
     }
     
+    private let _color: Color
     
     let id = UUID()
     
     @Published var state: TileStatus
     let action: () -> ()
     
-    init(tileState: TileStatus, action: @escaping () -> ()) {
+    init(tileState: TileStatus, color: Color, action: @escaping () -> ()) {
         self.state = tileState
         self.action = action
+        self._color = color
     }
     
     var allowsHitTesting: Bool {
@@ -36,11 +38,11 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
         get {
             switch(state) {
             case .bomb:
-                return .red
+                return flatRedColor()
             case .empty, .revealed(_):
-                return .gray
+                return flatWhiteColor()
             case .discovered(_):
-                return .green
+                return _color
             }
         }
     }
@@ -49,9 +51,9 @@ class TileViewModel : ObservableObject, Identifiable, CustomDebugStringConvertib
         get {
             switch(state) {
             case .revealed(true):
-                return .red
+                return flatRedColor()
             default:
-                return .white
+                return flatWhiteColor()
             }
         }
     }

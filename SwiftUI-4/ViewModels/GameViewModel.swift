@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import UIKit
+import SwiftUI
 
 class GameViewModel : ObservableObject {
     @Published private (set) var tiles = [TileViewModel]()
@@ -17,12 +18,15 @@ class GameViewModel : ObservableObject {
     @Published private (set) var events = [String]()
     @Published private (set) var isActive = true
     
+    let color: Color
+    
     private let game: GameLogic
     
-    init(game: GameLogic) {
+    init(game: GameLogic, color: Color) {
         self.game = game
         self.stake = game.stake
         self.next = game.next!
+        self.color = color
         
         events.append("Started game with \(game.bombAmount) bombs and an initial stake of \(game.initialStake)")
         bindTiles()
@@ -31,7 +35,7 @@ class GameViewModel : ObservableObject {
     private func bindTiles() {
         tiles.removeAll(keepingCapacity: true)
         for i in game.tiles.indices {
-            let model = TileViewModel(tileState: game.tiles[i]) {
+            let model = TileViewModel(tileState: game.tiles[i], color: color) {
                 self.revealTile(index: i)
             }
             tiles.append(model)
