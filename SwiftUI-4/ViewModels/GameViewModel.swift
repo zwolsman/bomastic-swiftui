@@ -40,6 +40,8 @@ class GameViewModel : ObservableObject {
     
     func cashout() {
         events.insert("Cashed out \(stake) points. You've earned \(stake - game.initialStake) points", at: 0)
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
         finish()
     }
     
@@ -54,8 +56,8 @@ class GameViewModel : ObservableObject {
         }
         if case TileStatus.bomb = newState {
             events.insert("You hit a bomb in tile \(index + 1) and lost \(stake) points!", at: 0)
-            let generator = UIImpactFeedbackGenerator(style: .heavy)
-            generator.impactOccurred()
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.error)
             finish()
         }
         
